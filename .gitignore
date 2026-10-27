@@ -1,0 +1,10 @@
+# generated model output
+out/
+
+# generated indexes (rebuild with: python3 scripts/index_parts.py)
+cache/parts.json
+cache/colors.json
+
+__pycache__/
+*.pyc
+.venv/
