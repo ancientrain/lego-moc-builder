@@ -14,7 +14,7 @@ import numpy as np
 from PIL import Image
 
 from ldrawlib import LDU_PLATE, LDU_STUD
-from model import ROT_MATRICES, Model
+from model import Model
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 COLORS = json.load(open(os.path.join(HERE, "..", "cache", "colors.json"), encoding="utf-8"))
@@ -57,11 +57,7 @@ def collect(model: Model):
     cols_all = []
     for p in model.parts:
         part_polys, _bb = lib.geometry(p.code)
-        m = ROT_MATRICES[p.rot]
-        rb = model._rotated_bbox(p)
-        tx = p.x * LDU_STUD - rb[0]
-        ty = -p.level * LDU_PLATE - rb[4] + p.y_off
-        tz = p.z * LDU_STUD - rb[2]
+        m = p.R
         base = rgb(p.colour)
         # faint per-part variation so coplanar bricks stay readable
         jitter = 0.965 + 0.07 * ((hash((p.code, p.x, p.z, p.level)) % 1000) / 1000.0)
@@ -72,7 +68,7 @@ def collect(model: Model):
                 continue
             a_, b_, c_, d_, e_, f_, g_, h_, i_ = m
             M = np.array([[a_, b_, c_], [d_, e_, f_], [g_, h_, i_]])
-            pts = pts @ M.T + np.array([tx, ty, tz])
+            pts = pts @ M.T + np.array([p.tx, p.ty, p.tz])
             colour = base if col in (16, 24) else rgb(col)
             # fan-triangulate quads
             if len(pts) == 3:

@@ -25,7 +25,10 @@ import check  # noqa: E402
 import render  # noqa: E402
 from model import Collision  # noqa: E402
 
-DESIGNS = ("cottage", "house", "villa")
+DESIGNS = ("cottage", "house", "villa", "milkfrog")
+
+DEFAULT_VIEWS = (("iso", dict(az=30, el=28)), ("front", dict(az=0, el=8)))
+FACE_VIEWS = (("iso", dict(az=200, el=18)), ("front", dict(az=180, el=5)))
 
 
 def bom_rows(model):
@@ -73,7 +76,8 @@ def main():
                         colours.get(str(col), {}).get("name", "?"), n])
 
     if not args.no_render:
-        for name, kw in (("iso", dict(az=30, el=28)), ("front", dict(az=0, el=8))):
+        views = FACE_VIEWS if args.design == "milkfrog" else DEFAULT_VIEWS
+        for name, kw in views:
             path = os.path.join(out, f"preview-{name}.png")
             _, polys = render.render(model, path, size=(1100, 850), **kw)
             print(f"render {name}: {polys} polys")
